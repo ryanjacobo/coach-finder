@@ -5,7 +5,7 @@ export default {
     return {
       userId: null, // used as the ID of the current (logged in) user
       token: null,
-      tokenExpiration: null,
+      // tokenExpiration: null,
     };
   },
   actions: {
@@ -24,7 +24,7 @@ export default {
           email: payload.email,
           password: payload.password,
           returnSecureToken: true,
-        }), // async - await replaces .then as the promise for a fetch
+        }), // async - await replaces '.then' as the promise for a fetch
       });
       const responseData = await response.json();
 
@@ -36,7 +36,8 @@ export default {
         throw error;
       }
 
-      const expiresIn = +responseData.expiresIn * 1000;
+      // const expiresIn = +responseData.expiresIn * 1000; // "+" converts responseData.expiresIn to a number
+      const expiresIn = 5000; // "+" converts responseData.expiresIn is converted to a number
       const expirationDate = new Date().getTime() + expiresIn;
 
       // save the token and userId to browser to stay logged in despite browser refresh
@@ -48,7 +49,8 @@ export default {
         context.dispatch("logout");
       }, expiresIn);
 
-      console.log(responseData);
+      console.log(localStorage);
+
       context.commit("setUser", {
         token: responseData.idToken,
         userId: responseData.localId,
@@ -60,7 +62,19 @@ export default {
     tryLogin(context) {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
+      const tokenExpiration = localStorage.getItem("tokenExpiration");
 
+      const expiresIn = +tokenExpiration - new Date().getTime();
+
+      if (expiresIn < 0) {
+        return;
+      }
+
+      timer = setTimeout(function() {
+        context.dispatch("logout");
+      }, expiresIn);
+
+      // keeps user logged in
       if (token && userId) {
         context.commit("setUser", {
           token: token,
@@ -82,6 +96,7 @@ export default {
       });
     },
     logout(context) {
+      // Auto Logout Step 1
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("tokenExpiration"); // tokenExpiration - token expires in 3600 secs (1 hour)
@@ -94,6 +109,7 @@ export default {
         // tokenExpiration: null,
       });
     },
+    autoLogout() {},
   },
   mutations: {
     setUser(state, payload) {
