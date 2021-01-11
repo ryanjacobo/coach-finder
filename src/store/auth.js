@@ -84,7 +84,7 @@ export default {
     logout(context) {
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
-      localStorage.removeItem("tokenExpiration");
+      localStorage.removeItem("tokenExpiration"); // tokenExpiration - token expires in 3600 secs (1 hour)
 
       clearTimeout(timer);
 
