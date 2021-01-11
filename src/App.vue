@@ -1,30 +1,58 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div>
+    <TheHeader />
+
+    <router-view v-slot="slotProps">
+      <transition name="route" mode="out-in">
+        <component :is="slotProps.Component"></component>
+      </transition>
+    </router-view>
   </div>
-  <router-view/>
 </template>
 
+<script>
+import TheHeader from "./components/TheHeader";
+
+export default {
+  components: { TheHeader },
+  created() {
+    this.$store.dispatch("tryLogin");
+  }
+};
+</script>
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  box-sizing: border-box;
 }
 
-#nav {
-  padding: 30px;
+html {
+  font-family: "Roboto", sans-serif;
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+body {
+  margin: 0;
+}
+.route-enter-from {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+.route-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.route-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.route-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.route-enter-to,
+.route-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
