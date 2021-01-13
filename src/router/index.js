@@ -2,12 +2,18 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import CoachesList from "../components/CoachesList.vue";
 import RequestsReceived from "../components/RequestsReceived.vue";
-import CoachRegistration from "../components/CoachRegistration.vue";
-import CoachDetails from "../components/CoachDetails.vue";
+// import CoachRegistration from "../components/CoachRegistration.vue";
+// import CoachDetails from "../components/CoachDetails.vue";
 import ContactCoach from "../components/ContactCoach.vue";
 import NotFound from "../components/NotFound.vue";
-import UserAuth from "../components/UserAuth.vue";
+// import UserAuth from "../components/UserAuth.vue";
 import store from "../store/index";
+// import { defineAsyncComponent } from "vue";
+
+// Not recommended to use defineAsyncComponent for routing
+const CoachDetails = () => import("../components/CoachDetails.vue");
+const CoachRegistration = () => import("../components/CoachRegistration.vue");
+const UserAuth = () => import("../components/UserAuth.vue");
 
 const routes = [
   {

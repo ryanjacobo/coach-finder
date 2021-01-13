@@ -6,6 +6,7 @@ export default {
       userId: null, // used as the ID of the current (logged in) user
       token: null,
       // tokenExpiration: null,
+      didAutoLogout: true,
     };
   },
   actions: {
@@ -36,8 +37,8 @@ export default {
         throw error;
       }
 
-      // const expiresIn = +responseData.expiresIn * 1000; // "+" converts responseData.expiresIn to a number
-      const expiresIn = 5000; // "+" converts responseData.expiresIn is converted to a number
+      const expiresIn = +responseData.expiresIn * 1000; // "+" converts responseData.expiresIn to a number
+      // const expiresIn = 5000; // "+" converts responseData.expiresIn is converted to a number
       const expirationDate = new Date().getTime() + expiresIn;
 
       // save the token and userId to browser to stay logged in despite browser refresh
@@ -46,7 +47,7 @@ export default {
       localStorage.setItem("tokenExpiration", expirationDate); // stores an expiration date on the token
 
       timer = setTimeout(function() {
-        context.dispatch("logout");
+        context.dispatch("autoLogout");
       }, expiresIn);
 
       console.log(localStorage);
@@ -71,7 +72,7 @@ export default {
       }
 
       timer = setTimeout(function() {
-        context.dispatch("logout");
+        context.dispatch("autoLogout");
       }, expiresIn);
 
       // keeps user logged in
@@ -109,13 +110,20 @@ export default {
         // tokenExpiration: null,
       });
     },
-    autoLogout() {},
+    autoLogout(context) {
+      context.dispatch("logout");
+      context.commit("setAutoLogout");
+    },
   },
   mutations: {
     setUser(state, payload) {
       state.token = payload.token;
       state.userId = payload.userId;
       // state.tokenExpiration = payload.tokenExpiration; // expiration date has been set automatically in the auth so no need to include in setUser
+      state.didAutoLogout = false;
+    },
+    setAutoLogout(state) {
+      state.didAutoLogout = true;
     },
   },
   getters: {
@@ -127,6 +135,12 @@ export default {
     },
     isAuthenticated(state) {
       return !!state.token; // '!!' converts state.token to a 'true' boolean
+    },
+    setAutoLogout(state) {
+      state.didAutoLogout = true;
+    },
+    didAutoLogout(state) {
+      return state.didAutoLogout;
     },
   },
 };
